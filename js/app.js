@@ -25,6 +25,27 @@ const escapeHTML = (s) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
+// Extract a compact founding year/era for use on order cards.
+// Examples:
+//   "1209–1210 AD (oral approval by Innocent III); formally 1223 ..."  -> "1209–1210 AD"
+//   "c. 529 AD"                                                          -> "c. 529 AD"
+//   "6th century"                                                        -> "6th century"
+function shortFoundedDate(s) {
+  if (!s) return "—";
+  const str = String(s).trim();
+  // Prefer a 4-digit year (optionally a range), optionally with AD/BC/CE/BCE suffix.
+  let m = str.match(/(?:c\.\s*)?\d{3,4}(?:\s*[–—-]\s*\d{3,4})?(?:\s*(?:AD|BC|CE|BCE))?/i);
+  if (m) return m[0].replace(/\s+/g, " ").trim();
+  // Then try any 1-4 digit year (covers ancient dates like "33 AD").
+  m = str.match(/(?:c\.\s*)?\d{1,4}(?:\s*(?:AD|BC|CE|BCE))/i);
+  if (m) return m[0].replace(/\s+/g, " ").trim();
+  // Fallback: century phrase like "6th century"
+  const c = str.match(/\d{1,2}(?:st|nd|rd|th)\s+century/i);
+  if (c) return c[0];
+  // Last resort: first short clause
+  return str.split(/[(;,]/)[0].trim().slice(0, 30);
+}
+
 function paragraphs(text) {
   if (!text) return "";
   return String(text)
@@ -361,7 +382,7 @@ function renderOrders() {
           ${o.motto ? `<p class="order-card__motto">"${escapeHTML(o.motto)}"</p>` : ""}
           <p class="order-card__excerpt">${escapeHTML(excerpt)}</p>
         </div>
-        <div class="order-card__date">Founded<strong>${escapeHTML(o.founded || "—")}</strong></div>
+        <div class="order-card__date"><span class="order-card__date-label">Founded</span><strong>${escapeHTML(shortFoundedDate(o.founded))}</strong></div>
       </article>`;
   }).join("");
 

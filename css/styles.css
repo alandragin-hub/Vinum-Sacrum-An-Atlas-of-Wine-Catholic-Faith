@@ -658,8 +658,11 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-500);
-  white-space: nowrap;
   min-width: 100px;
+}
+.order-card__date-label {
+  display: block;
+  margin-bottom: var(--space-1);
 }
 .order-card__date strong {
   display: block;
