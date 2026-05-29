@@ -46,6 +46,22 @@ function shortFoundedDate(s) {
   return str.split(/[(;,]/)[0].trim().slice(0, 30);
 }
 
+// Pull the parenthetical / secondary clause out of a founding string so it
+// can be shown as a smaller subtitle. Returns "" if there's nothing extra.
+function foundedDateDetail(s) {
+  if (!s) return "";
+  const str = String(s).trim();
+  const short = shortFoundedDate(s);
+  // Remove the short date from the front, then strip leading punctuation.
+  let rest = str;
+  const idx = str.indexOf(short);
+  if (idx >= 0) rest = str.slice(idx + short.length);
+  rest = rest.replace(/^[\s.,;:—–-]+/, "").trim();
+  // Drop wrapping parens if the whole remainder is one parenthetical.
+  if (/^\([^()]*\)$/.test(rest)) rest = rest.slice(1, -1).trim();
+  return rest;
+}
+
 function paragraphs(text) {
   if (!text) return "";
   return String(text)
@@ -394,8 +410,19 @@ function renderOrders() {
 // ==========================================================================
 function openModal(html) {
   $("#modalContent").innerHTML = html;
-  $("#modal").hidden = false;
-  $(".modal__sheet").scrollTop = 0;
+  const modal = $("#modal");
+  modal.hidden = false;
+  // Reset scroll position on every scrollable container in the modal tree.
+  // The actual scroller is .modal (overflow-y:auto); .modal__sheet is reset
+  // defensively in case future layouts move the scroll to the sheet.
+  modal.scrollTop = 0;
+  const sheet = $(".modal__sheet");
+  if (sheet) sheet.scrollTop = 0;
+  // Some browsers restore scroll asynchronously; re-pin to top after layout.
+  requestAnimationFrame(() => {
+    modal.scrollTop = 0;
+    if (sheet) sheet.scrollTop = 0;
+  });
   document.body.style.overflow = "hidden";
   // Wire cross-links
   $$(".cross-link", $("#modalContent")).forEach((link) => {

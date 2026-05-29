@@ -900,28 +900,52 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .saint-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--space-5);
+  row-gap: var(--space-3);
+  align-items: baseline;
   margin: var(--space-3) 0 var(--space-6);
-  padding: var(--space-3) 0;
+  padding: var(--space-4) 0;
   border-top: 1px solid var(--parchment-400);
   border-bottom: 1px solid var(--parchment-400);
 }
 .saint-meta__item {
+  display: contents;
   font-family: var(--font-body);
   font-size: var(--text-sm);
 }
 .saint-meta__label {
-  display: block;
   font-family: var(--font-inscription);
   font-size: var(--text-xs);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--gold-600);
-  margin-bottom: 2px;
+  white-space: nowrap;
+  padding-top: 2px;
 }
-.saint-meta__value { color: var(--ink-900); font-style: italic; }
+.saint-meta__value {
+  color: var(--ink-900);
+  font-style: italic;
+  line-height: 1.55;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.saint-meta__detail {
+  display: block;
+  font-style: normal;
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+@media (max-width: 640px) {
+  .saint-meta {
+    grid-template-columns: 1fr;
+    row-gap: var(--space-2);
+  }
+  .saint-meta__label { padding-top: var(--space-2); }
+}
 
 /* Wine pills */
 .wine-pills {
